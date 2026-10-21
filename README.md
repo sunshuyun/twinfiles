@@ -1,2 +1,90 @@
-# twinfiles
-Offline, read-only duplicate file finder with SHA-256, HTML/JSON reports, and zero third-party dependencies.
+# TwinFiles
+
+**离线查找重复文件，生成易读报告。文件内容只读，零第三方依赖。**
+
+[English](README.en.md) · [示例 HTML 报告](examples/report.html) · [贡献指南](CONTRIBUTING.md)
+
+下载目录堆满副本、资料备份重名、文件改名后找不到重复内容？TwinFiles 递归检查一个文件夹，先按大小筛选，再对可能重复的文件计算 SHA-256。不同名称也能找到；大小相同但内容不同的文件不会合并。
+
+## 上手
+
+需要 **Node.js 22 或更新版本**。本项目无 npm 依赖，无需 `npm install`。
+
+Windows 用户双击 `Start-Windows.cmd`，粘贴文件夹路径后回车；直接回车会检查随附的示例文件。完成后自动打开 HTML 报告，报告保存在项目目录下的 `.twinfiles-reports/`。
+
+命令行用法（Windows、macOS、Linux）：
+
+```sh
+node bin/twinfiles.mjs "你的文件夹路径"
+node bin/twinfiles.mjs ./examples/files --format html --out report.html
+node bin/twinfiles.mjs ./examples/files --format json --out report.json
+```
+
+`--out` 只创建新文件，遇到已有文件会报错。报告父目录需已存在。终端用法默认只在屏幕显示，不保存文件。
+
+## 它能做什么
+
+- 递归查找内容相同的普通文件，支持中文路径和文件名。
+- 报告重复组、额外副本数、额外副本内容大小。
+- 输出终端文本、结构化 JSON、无脚本和远端资源的 HTML。
+- 默认跳过 `.git`、`node_modules`、`.twinfiles-reports`。
+- 跳过符号链接和目录联接；同一硬链接文件只计算一次。
+- 用流读取大文件；只为大小相同的候选文件计算摘要。
+- 遇到访问错误、文件消失或可检测的改动时，记录错误并继续其他文件。
+- Ctrl+C 可取消扫描；不会上传内容、调用 AI 或要求 API Key。
+
+## 参数
+
+| 参数 | 含义 |
+| --- | --- |
+| `--wizard` | 中文交互，保存 HTML / JSON 报告 |
+| `--format text\|html\|json` | 默认 `text` |
+| `--out 文件路径` | 将报告写入一个新文件 |
+| `--exclude 名称` | 逐层跳过这个文件或目录名，可重复传入；不支持路径 / 通配符 |
+| `--min-bytes N` | 最小文件大小，默认 1 字节；0 会纳入空文件 |
+| `--help` / `--version` | 查看帮助 / 版本 |
+| `--` | 结束选项，用于名称以 `--` 开头的文件夹 |
+
+```sh
+node bin/twinfiles.mjs "D:/Downloads" --exclude cache --exclude backups --min-bytes 1024
+```
+
+Windows 排除名称比较不区分大小写，其他平台区分大小写。
+
+退出码：`0` 扫描完成；`1` 参数、路径或报告写入错误；`2` 有扫描错误，结果不完整；`130` 取消。重复文件本身不会造成非零退出码。
+
+## 先看示例
+
+```sh
+node scripts/demo.mjs
+```
+
+随附 5 个虚构样本文件，会发现 2 个重复组、2 个额外副本。打开 `examples/report.html` 可查看报告。示例报告使用相对路径，不包含开发机器路径。
+
+## 原理与边界
+
+1. 枚举文件并按大小分组；没有相同大小伙伴的文件不读取内容。
+2. 对候选文件流式计算 SHA-256；相同大小、相同摘要归为一组。
+3. 检查读取前后大小、修改 / 元数据时间、设备与文件标识，尽量发现扫描中途的变化。
+
+SHA-256 比较不是额外的逐字节二次比较。扫描也不是文件系统快照，请选取扫描期间不会被其他程序改动的普通本地目录。它不是用来隔离恶意文件系统或攻击者的安全沙箱；文件扫描后仍可能变化。文件列表需要内存，大型目录耗时取决于文件数量、候选文件体积和存储速度。
+
+“额外副本内容大小”不是磁盘空间释放承诺：压缩、稀疏文件、去重存储、云盘占位文件等会影响实际占用。读取云盘文件可能触发云盘客户端下载。本工具本身没有网络代码。普通读取可能更新操作系统的访问时间，但不会改写原文件内容。
+
+真实报告包含绝对扫描目录、相对文件名和摘要，请检查后再分享。文件没有“建议保留的第一份”之分；手动清理前，请核对用途并做好备份。
+
+## 开发与验证
+
+```sh
+node --test
+```
+
+测试覆盖同大小不同内容、中文和空格路径、二进制大块读取、空文件、排除规则、硬链接、符号链接、取消、扫描期间文件变化，以及报告转义和写入时防覆盖。部分系统不允许创建链接时，对应测试会显示跳过。
+
+GitHub Actions 配置会在推送后运行 Windows / Ubuntu 的 Node.js 22 / 24 测试。配置存在不代表远端测试已经运行；请以仓库 Actions 页面为准。
+
+## 维护与许可
+
+初始版本：0.1.0。欢迎提交可复现的问题、测试和文档改进。详见 [CONTRIBUTING.md](CONTRIBUTING.md)、[CHANGELOG.md](CHANGELOG.md)。
+
+MIT 许可，见 [LICENSE](LICENSE)。初版使用 Codex 辅助开发；维护者负责理解、审查和后续维护。

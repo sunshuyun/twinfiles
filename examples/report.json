@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "root": "examples/files (演示文件夹 / demo folder)",
+  "generatedAt": "2026-10-21T00:00:00.000Z (deterministic demo)",
+  "algorithm": "SHA-256",
+  "minBytes": 1,
+  "excludedNames": [
+    ".git",
+    ".twinfiles-reports",
+    "node_modules"
+  ],
+  "stats": {
+    "discoveredFiles": 5,
+    "eligibleFiles": 5,
+    "hashedFiles": 4,
+    "skippedSmallFiles": 0,
+    "skippedLinks": 0,
+    "skippedHardlinks": 0,
+    "excludedEntries": 0,
+    "skippedSpecialFiles": 0
+  },
+  "summary": {
+    "duplicateGroups": 2,
+    "extraCopies": 2,
+    "redundantBytes": 142
+  },
+  "groups": [
+    {
+      "sha256": "915c4233121b41ed62c8a3e0085c77c215f4243ee3359182f62c9000fc5c1353",
+      "bytes": 92,
+      "redundantBytes": 92,
+      "files": [
+        "backups/project-plan-copy.txt",
+        "notes/project-plan.txt"
+      ]
+    },
+    {
+      "sha256": "5b60230080e627eb6f7d72403a11e2053e5e4d289277cd0bb79d4c78cd81fe23",
+      "bytes": 50,
+      "redundantBytes": 50,
+      "files": [
+        "backups/list-copy.csv",
+        "资料/清单.csv"
+      ]
+    }
+  ],
+  "errors": []
+}

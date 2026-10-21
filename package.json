@@ -1,0 +1,14 @@
+{
+  "name": "twinfiles",
+  "version": "0.1.0",
+  "description": "An offline, read-only duplicate file finder with HTML and JSON reports.",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "test": "node --test",
+    "start": "node bin/twinfiles.mjs --wizard",
+    "demo": "node scripts/demo.mjs"
+  }
+}

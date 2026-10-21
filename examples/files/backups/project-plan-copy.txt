@@ -1,0 +1,3 @@
+TwinFiles project notes
+Keep file scanning offline.
+Review duplicate groups before cleanup.
